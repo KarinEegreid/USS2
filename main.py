@@ -21,16 +21,19 @@ blue = (50, 153, 213)  # sinine värv
 # Ekraani loomine ning pealkirja seadistamine
 dis_width = 800  # ekraani laius
 dis_height = 600  # ekraani pikkus
-
 dis = pygame.display.set_mode((dis_width, dis_height))  # loob ekraani
 pygame.display.set_caption('Karl Paju IS22 Ussimäng')  # loob ekraani nime
 
 # Loob mängu kiiruse juhtimiseks kellaobjekt.
 clock = pygame.time.Clock()
 
+# Loome taustaheli
 pygame.mixer.music.load("Mario.wav")  # Laeb laulu
-
 pygame.mixer.music.play(-1)  # Laul käib kuni mängu lõpuni
+
+# Loome heli kui uss sööb toidu ära
+score_sound = pygame.mixer.Sound('score.mp3')
+
 
 # Määrame ussi suuruse ning kiiruse
 snake_block = 10  # Määrab iga mao osa suuruse, mis on 10 pikslit.
@@ -50,7 +53,7 @@ def Your_score(score):  # Funktsioon kuvab mängija skoori mängu ekraani ülemi
     dis.blit(value, [0, 0])  # Kuvab skoori muutuja value väärtuse mängu akna ülemises vasakus nurgas.
 
 
-
+#Loome algskoori
 score = 0  # siin on näidisskoor
 
 # Defineerime start time
@@ -65,7 +68,8 @@ def our_snake(snake_block, snake_list):  # Funktsioon joonistab kogu ussi tema i
         # x[0] ja x[1] vastavad ussi elemendi x- ja y-koordinaatidele.
         pygame.draw.rect(dis, black, [x[0], x[1], snake_block, snake_block])
 
-
+    # Load the sound effect file
+    eat_sound = pygame.mixer.Sound('score.mp3')
 
 
 # Määrab funktsiooni message(), et joonistada ekraanile nõutud värvides teksti.
@@ -99,7 +103,7 @@ def gameLoop():
         # Kui mäng on läbi, siis kuvatakse ekraanile sõnum, mis ütleb, et mängija kaotas
         while game_close == True:  # Sisemine tsükkel, mis käivitub, kui mängija kaotas
 
-            dis.fill(blue)  # Tühjendab ekraani sinise värviga
+            dis.fill(black)  # Tühjendab ekraani sinise värviga
             message("Kaotasid. Vajuta C-d, et uuesti mängida või Q-d, et mäng sulgeda.",
                     red)  # Kutsub esile funktsiooni message, mis kuvab ekraanile teate
             Your_score(Length_of_snake - 1)  # arvutab skoori lahutades ära number ühe ussi pikkusest
@@ -153,13 +157,13 @@ def gameLoop():
         our_snake(snake_block, snake_List)  # joonistab ussi
         Your_score(Length_of_snake - 1)  # arvutab skoori lahutades ussi pikkusest ühe
 
-        # Calculate elapsed time
+        # Kalkuleerime mängitud aja
         elapsed_time = time.time() - start_time
 
         # Loob ekraanile Timeri
-        timer_text = font_style.render(f"Mängitud aeg: {int(elapsed_time)} Sekundit", True, white)
-        timer_rect = timer_text.get_rect()
-        timer_rect.topright = (dis_width - 10, 10)
+        timer_text = font_style.render(f"Mängitud aeg: {int(elapsed_time)} Sekundit", True, white) # Määrame muutujale timer_text väärtuse
+        timer_rect = timer_text.get_rect() # Määrame muutujale timer_text.get_rect()
+        timer_rect.topright = (dis_width - 10, 10) # Määrame timeri asukoha ekraanil
 
         # Joonistame timeri ekraanile
         dis.blit(timer_text, timer_rect)
@@ -187,12 +191,12 @@ def gameLoop():
             return highscore  # Funktsioon tagastab kõrgeima skoori, kas siis failist või sisendiks antud skoori järgi.
 
         # Loome ekraanile Highscore
-        current_highscore = highscore(score)
-        highscore_text = highscore_font.render(f"Highscore: {int(current_highscore)}", True, white)
-        highscore_rect = highscore_text.get_rect()
-        highscore_rect.topright = (dis_width - 25, 25)
+        current_highscore = highscore(score) # Anname muutujale current_highscore väärtuse
+        highscore_text = highscore_font.render(f"Highscore: {int(current_highscore)}", True, white) # Anname muutujale highscore_Text väärtuse
+        highscore_rect = highscore_text.get_rect() # Anname muutujale highscore_text.get_rect() väärtuse
+        highscore_rect.topright = (dis_width - 25, 25) # Anname muutujale highscore_rect.topright väärtuse
 
-        dis.blit(highscore_text, highscore_rect) # Loob ekraanile
+        dis.blit(highscore_text, highscore_rect) # Loob ekraanile highscore
 
         pygame.display.update()  # uuendab ekraani
 
@@ -200,6 +204,10 @@ def gameLoop():
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0  # Määrab toidu uue x-koordinaadi
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0  # Määrab toidu uue y-koordinaadi
             Length_of_snake += 1  # Lisab ühe jupi mao pikkusele
+            # Play the eat sound effect
+            eat_sound = pygame.mixer.Sound('score.mp3') # laeb soundi
+            eat_sound.play() # Käivitab soundi
+
         clock.tick(snake_speed)  # Paus mängu kiiruse säilitamiseks
 
     pygame.quit()  # Sulgeb pygame'i mooduli
